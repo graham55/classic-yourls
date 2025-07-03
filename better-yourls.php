@@ -1,43 +1,33 @@
 <?php
-/*
-Plugin Name: Better YOURLS
-Plugin URI: https://wordpress.org/plugins/better-yourls/
-Description: Replace WordPress shortlinks with custom YOURLS domain.
-Version: 2.0.0
-Text Domain: better-yourls
-Domain Path: /lang
-Author: Chris Wiegman
-Author URI: https://www.chriswiegman.com/
+/**
+Plugin Name: Classic YOURLS
+Description: Connect your WordPress or ClassicPress site to your YOURLS instance.
+Version: 2.3.0
+Original Author: Chris Wiegman ( better-YOURLs )
+Original Author URI: https://www.chriswiegman.com/
+Contributor: Graham McKoen ( Fork Classic YOURLs )
+Author: Chris Weigman - Graham McKoen
 License: GPLv2
-Copyright 2015 Chris Wiegman  (email: info@chriswiegman.com)
+Original Copyright: 2015 Chris Wiegman  (email: info@chriswiegman.com)
+Copyright: 2025 Graham McKoen & Chris Weigman (graham@cambmail.com - info@chriswiegman.com)
 */
 
-define( 'BYOURLS_VERSION', '2.0.0' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+// Define constants
+define( 'BYOURLS_VERSION', '2.3.0' );
+define( 'BYOURLS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'BYOURLS_URL', plugin_dir_url( __FILE__ ) );
 
-add_action( 'plugins_loaded', 'better_yourls_loader' );
+// Load core classes
+require_once BYOURLS_PATH . 'includes/class-better-yourls-admin.php';
+require_once BYOURLS_PATH . 'includes/class-better-yourls-actions.php';
 
-function better_yourls_loader() {
+// Initialize
+new Better_YOURLS_Admin();
+new Better_YOURLS_Actions();
 
-	//remember the text domain
-	load_plugin_textdomain( 'better-yourls', false, dirname( dirname( __FILE__ ) ) . '/lang' );
-
-	//Load front end items
-	if ( ! class_exists( 'Better_YOURLS_Actions' ) ) {
-		require( dirname( __FILE__ ) . '/classes/class-better-yourls-actions.php' );
-	}
-
-	new Better_Yourls_Actions();
-
-	//Load Dashboard items
-	if ( is_admin() ) {
-
-		if ( ! class_exists( 'Better_YOURLS_Admin' ) ) {
-			require( dirname( __FILE__ ) . '/classes/class-better-yourls-admin.php' );
-		}
-
-		new Better_Yourls_Admin();
-
-	}
-
-}
+// Register shortcode
+require_once BYOURLS_PATH . 'includes/shortcodes.php';
