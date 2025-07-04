@@ -1,51 +1,56 @@
 <?php
 /**
- * Shortcode for Better YOURLS.
+ * Classic YOURLS Shortcodes
  *
- * Usage: [better_yourls_shortlink id="123" text="Click here"]
- *
- * @package better-yourls
+ * @package Classic_YOURLS
  */
 
-// Helper function: fetches the shortlink from post meta
-if ( ! function_exists( 'better_yourls_get_link' ) ) {
-	function better_yourls_get_link( $post_id ) {
-		$link = get_post_meta( $post_id, '_better_yourls_short_link', true );
-		return $link ? esc_url( $link ) : '';
-	}
+// Prevent direct access
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
 }
 
-// Register the shortcode
-add_shortcode( 'better_yourls_shortlink', function( $atts ) {
-	global $post;
+/**
+ * Register the shortcode
+ */
+add_shortcode( 'classic_yourls_shortlink', function( $atts ) {
+    global $post;
+    
+    $atts = shortcode_atts( array(
+        'id' => $post ? $post->ID : 0,
+        'text' => '',
+    ), $atts );
 
-	// Check if shortcode is enabled in plugin settings
-	$options = get_option( 'better_yourls' );
-	if ( empty( $options['shortcode_enabled'] ) ) {
-		return '';
-	}
+    $id = absint( $atts['id'] );
+    if ( ! $id ) {
+        return '';
+    }
 
-	// Defaults
-	$atts = shortcode_atts( array(
-		'id'   => $post ? $post->ID : 0,
-		'text' => '',
-	), $atts );
+    // Get the saved shortlink
+    $link = classic_yourls_get_link( $id );
+    if ( ! $link ) {
+        return '';
+    }
 
-	$id = absint( $atts['id'] );
-	if ( ! $id ) {
-		return '';
-	}
+    // Return linked text if provided, otherwise link using the URL itself
+    if ( ! empty( $atts['text'] ) ) {
+        return '<a href="' . esc_url( $link ) . '">' . esc_html( $atts['text'] ) . '</a>';
+    }
 
-	// Get the saved shortlink
-	$link = better_yourls_get_link( $id );
-	if ( ! $link ) {
-		return '';
-	}
-
-	// Return linked text if provided, otherwise link using the URL itself
-	if ( ! empty( $atts['text'] ) ) {
-		return '<a href="' . esc_url( $link ) . '">' . esc_html( $atts['text'] ) . '</a>';
-	}
-
-	return '<a href="' . esc_url( $link ) . '">' . esc_html( $link ) . '</a>';
+    return '<a href="' . esc_url( $link ) . '">' . esc_html( $link ) . '</a>';
 } );
+
+/**
+ * Helper function to get shortlink (maintains backward compatibility)
+ */
+function classic_yourls_get_link( $post_id ) {
+    // Try new meta key first
+    $link = get_post_meta( $post_id, '_classic_yourls_short_link', true );
+    
+    // Fall back to old meta key for backward compatibility
+    if ( ! $link ) {
+        $link = get_post_meta( $post_id, '_better_yourls_short_link', true );
+    }
+    
+    return $link;
+}

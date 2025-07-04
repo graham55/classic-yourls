@@ -4,7 +4,7 @@ Donate link: https://aaroneaton.blog
 Tags: yourls, shortlink, custom shortlink
 Requires at least: 4.2
 Tested up to: 5.1
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,13 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 1. Easy to use with only 2 options.
 
 == Changelog ==
+
+= 2.4.0 =
+* Initial fork and rebrand to Classic YOURLS
+* Plugin adopted by Graham McKoen <a href="https://github.com/graham55/classic-yourls" target="_blank">https://github.com/graham55/classic-yourls</a>
+* Updated all internal references to use classic_yourls naming convention
+* Maintained full backward compatibility with existing installations
+
 
 = 2.3.0 =
 * Plugin is now compatible with Gutenberg.

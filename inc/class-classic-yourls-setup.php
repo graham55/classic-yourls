@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package better_yourls
+ * @package classic_yourls
  */
 
 /**
@@ -10,16 +10,16 @@
  * @since 0.0.1
  *
  */
-class Better_YOURLS_Setup {
+class Classic_YOURLS_Setup {
 
 	/**
-	 * Better YOURLS constructor.
+	 * Classic YOURLS constructor.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @param string $case The case to execute
 	 *
-	 * @return Better_YOURLS_Setup
+	 * @return Classic_YOURLS_Setup
 	 */
 	function __construct( $case = false ) {
 
@@ -51,7 +51,7 @@ class Better_YOURLS_Setup {
 	 */
 	public static function on_activate() {
 
-		new Better_YOURLS_Setup( 'activate' );
+		new Classic_YOURLS_Setup( 'activate' );
 	}
 
 	/**
@@ -63,13 +63,13 @@ class Better_YOURLS_Setup {
 	 */
 	public static function on_deactivate() {
 
-		if ( defined( 'BETTER_YOURLS_DEVELOPMENT' ) && BETTER_YOURLS_DEVELOPMENT == true ) {
+		if ( defined( 'CLASSIC_YOURLS_DEVELOPMENT' ) && CLASSIC_YOURLS_DEVELOPMENT == true ) {
 			$case = 'uninstall';
 		} else {
 			$case = 'deactivate';
 		}
 
-		new Better_YOURLS_Setup( $case );
+		new Classic_YOURLS_Setup( $case );
 	}
 
 	/**
@@ -85,7 +85,7 @@ class Better_YOURLS_Setup {
 			return;
 		}
 
-		new Better_YOURLS_Setup( 'uninstall' );
+		new Classic_YOURLS_Setup( 'uninstall' );
 	}
 
 	/**
@@ -96,7 +96,11 @@ class Better_YOURLS_Setup {
 	 * @return void
 	 */
 	function activate_execute() {
-
+		// Migrate old settings to new option name for backward compatibility
+		$old_settings = get_option( 'better_yourls' );
+		if ( $old_settings && ! get_option( 'classic_yourls' ) ) {
+			update_option( 'classic_yourls', $old_settings );
+		}
 	}
 
 	/**
@@ -128,10 +132,11 @@ class Better_YOURLS_Setup {
 	 * @return void
 	 */
 	function uninstall_execute() {
-
-		delete_option( 'better_yourls' );
-		delete_metadata( 'post', null, '_better_yourls_short_link', null, true );
-
+		// Clean both old and new option names for complete cleanup
+		delete_option( 'classic_yourls' );
+		delete_option( 'better_yourls' ); // Keep for backward compatibility cleanup
+		delete_metadata( 'post', null, '_classic_yourls_short_link', null, true );
+		delete_metadata( 'post', null, '_better_yourls_short_link', null, true ); // Keep for backward compatibility cleanup
 	}
 
 }
