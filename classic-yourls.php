@@ -24,12 +24,6 @@ require_once( CYOURLS_PATH . 'includes/class-classic-yourls-setup.php' );
 require_once( CYOURLS_PATH . 'includes/class-classic-yourls-actions.php' );
 require_once( CYOURLS_PATH . 'includes/class-classic-yourls-admin.php' );
 
-// Include shortcode functionality if enabled
-$settings = get_option( 'classic_yourls' );
-if ( ! empty( $settings['shortcode_enabled'] ) ) {
-    require_once( CYOURLS_PATH . 'includes/shortcodes.php' );
-}
-
 // Register hooks
 register_activation_hook( __FILE__, array( 'Classic_YOURLS_Setup', 'on_activate' ) );
 register_deactivation_hook( __FILE__, array( 'Classic_YOURLS_Setup', 'on_deactivate' ) );
@@ -40,3 +34,13 @@ if ( is_admin() ) {
 }
 
 new Classic_YOURLS_Actions();
+
+// Load shortcode functionality after WordPress is fully loaded
+add_action( 'init', 'classic_yourls_load_shortcode' );
+
+function classic_yourls_load_shortcode() {
+    $settings = get_option( 'classic_yourls' );
+    if ( ! empty( $settings['shortcode_enabled'] ) ) {
+        require_once( CYOURLS_PATH . 'includes/shortcodes.php' );
+    }
+}
