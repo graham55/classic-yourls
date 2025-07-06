@@ -1,7 +1,7 @@
 === Classic YOURLS ===
 Contributors: channeleaton, ChrisWiegman, michaelbeil, domsammut, Graham McKoen
 Donate link: https://aaroneaton.blog
-Tags: yourls, shortlink, custom shortlink
+Tags: yourls, shortlink, custom shortlink, shortlink short codes
 Requires at least: 4.2
 Tested up to: 5.1
 Stable tag: 2.4.0
