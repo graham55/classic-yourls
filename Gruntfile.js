@@ -6,10 +6,12 @@ module.exports = function ( grunt ) {
     uglify : {
       production : {
         options : {
-          beautify : false,
-          preserveComments : false,
+          output: {
+            beautify : false,
+            comments: false
+          },
           mangle : {
-            except : ['jQuery']
+            reserved : ['jQuery']
           }
         },
         files : {
@@ -25,7 +27,7 @@ module.exports = function ( grunt ) {
 
     autoprefixer : {
       options : {
-        browsers : ['last 5 versions'],
+        overrideBrowserslist : ['last 5 versions'],
         map : true
       },
       files : {
@@ -51,9 +53,11 @@ module.exports = function ( grunt ) {
     sass : {
       dist : {
         options : {
-          style : 'expanded',
+          implementation: require('sass'),
+          outputStyle : 'expanded',
           sourceMap : true,
-          noCache : true
+          sourceMapEmbed: false,
+          precision: 8
         },
         files : {
           'assets/css/classic-yourls.css' : 'assets/css/classic-yourls.scss'
@@ -65,8 +69,9 @@ module.exports = function ( grunt ) {
       target : {
         options : {
           type : 'wp-plugin',
-          domainPath : '/lang',
-          mainFile : 'classic-yourls.php'
+          domainPath : '/languages',
+          mainFile : 'classic-yourls.php',
+          potFilename: 'classic-yourls.pot'
         }
       }
     },

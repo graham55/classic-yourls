@@ -1,0 +1,31 @@
+# Node.js dependencies
+node_modules/
+
+# Generated/compiled files
+assets/css/*.css
+assets/css/*.css.map
+assets/js/*.min.js
+assets/js/*.min.js.map
+
+# Generated translation files
+languages/*.pot
+lang/*.pot
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Editor files
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Temporary files
+*~
+.tmp/

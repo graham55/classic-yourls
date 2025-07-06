@@ -3,16 +3,16 @@
   "private": true,
   "version": "2.4.0",
   "description": "Grunt base for the Classic YOURLS Plugin.",
-  "dependencies": {},
   "devDependencies": {
     "grunt": "*",
+    "grunt-autoprefixer": "*",
+    "grunt-contrib-cssmin": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-watch": "*",
     "grunt-sass": "*",
-    "grunt-contrib-cssmin": "*",
+    "grunt-wp-i18n": "*",
     "load-grunt-tasks": "*",
-    "grunt-autoprefixer": "*",
-    "grunt-wp-i18n": "*"
+    "sass": "^1.89.2"
   },
   "author": "Graham McKoen",
   "repository": {
