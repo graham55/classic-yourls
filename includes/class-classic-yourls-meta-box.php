@@ -54,16 +54,50 @@ class Classic_YOURLS_Meta_Box {
         echo '<input type="text" id="classic_yourls_keyword" name="classic_yourls_keyword" value="' . esc_attr( $keyword ) . '" style="width: 100%;" />';
         echo '</p>';
 
-        // Add Post ID and shortcode usage hint
+        // Display current short link
         echo '<p><strong>' . esc_html__( 'Short Link:', 'classic-yourls' ) . '</strong><br>';
-        echo '<code>' . esc_html( $shortlink ) . '</code></p>';
+        if ( $shortlink ) {
+            echo '<code style="word-break: break-all;">' . esc_html( $shortlink ) . '</code>';
+        } else {
+            echo '<em>' . esc_html__( 'No short link generated yet', 'classic-yourls' ) . '</em>';
+        }
+        echo '</p>';
 
+        // Display Post ID
         echo '<p><strong>' . esc_html__( 'Post ID:', 'classic-yourls' ) . '</strong> ' . intval( $post->ID ) . '</p>';
 
-        echo '<p><em>' . sprintf(
-            esc_html__( 'Use in shortcode: [classic_yourls_shortlink id="%d"]', 'classic-yourls' ),
-            intval( $post->ID )
-        ) . '</em></p>';
+        // Enhanced shortcode examples section
+        echo '<div style="background: #f9f9f9; padding: 10px; border-left: 4px solid #0073aa; margin: 10px 0;">';
+        echo '<p><strong>' . esc_html__( 'Shortcode Examples:', 'classic-yourls' ) . '</strong></p>';
+        
+        echo '<p><code>[classicyourls_shortlink id="' . intval( $post->ID ) . '"]</code><br>';
+        echo '<small style="color: #666;">' . esc_html__( 'Display short link for this post', 'classic-yourls' ) . '</small></p>';
+
+        echo '<p><code>[classicyourls_shortlink id="' . intval( $post->ID ) . '" text="Read More"]</code><br>';
+        echo '<small style="color: #666;">' . esc_html__( 'Custom link text', 'classic-yourls' ) . '</small></p>';
+
+        echo '<p><code>[classicyourls_shortlink]</code><br>';
+        echo '<small style="color: #666;">' . esc_html__( 'Auto-detect current post (when used in this post)', 'classic-yourls' ) . '</small></p>';
+        echo '</div>';
+
+        // Check if shortcodes are enabled
+        $settings = get_option( 'classic_yourls' );
+        if ( empty( $settings['shortcode_enabled'] ) ) {
+            echo '<div style="background: #fff3cd; padding: 8px; border-left: 4px solid #ffc107; margin: 10px 0;">';
+            echo '<p><strong>' . esc_html__( 'Note:', 'classic-yourls' ) . '</strong> ';
+            echo esc_html__( 'Shortcodes are currently disabled. Enable them in', 'classic-yourls' ) . ' ';
+            echo '<a href="' . esc_url( admin_url( 'options-general.php?page=classic_yourls' ) ) . '">';
+            echo esc_html__( 'Classic YOURLS Settings', 'classic-yourls' ) . '</a>.</p>';
+            echo '</div>';
+        } else {
+            // Show excerpt processing status if shortcodes are enabled
+            if ( ! empty( $settings['excerpt_shortcodes_enabled'] ) ) {
+                echo '<div style="background: #d1ecf1; padding: 8px; border-left: 4px solid #17a2b8; margin: 10px 0;">';
+                echo '<p><strong>' . esc_html__( 'Tip:', 'classic-yourls' ) . '</strong> ';
+                echo esc_html__( 'Shortcodes also work in post excerpts!', 'classic-yourls' ) . '</p>';
+                echo '</div>';
+            }
+        }
     }
 
     /**

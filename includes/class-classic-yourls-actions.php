@@ -117,10 +117,10 @@ class Classic_YOURLS_Actions {
         echo '<input type="text" id="classic-yourls-keyword" name="classic-yourls-keyword" value="' . esc_attr( $link ) . '" ' . $readonly . 'style="width: 100%;" />';
         echo '<p><em>' . esc_html__( 'If a short-url doesn\'t yet exist for this post you can enter a keyword above. If it already exists it will be displayed.', 'classic-yourls' ) . '</em></p>';
 
-        // Add Post ID and shortcode usage hint
+        // Add Post ID and shortcode usage hint - CORRECTED SHORTCODE NAME
         echo '<p><strong>' . esc_html__( 'Post ID:', 'classic-yourls' ) . '</strong> ' . intval( $post->ID ) . '</p>';
         echo '<p><em>' . sprintf(
-            esc_html__( 'Use in shortcode: [classic_yourls_shortlink id="%d"]', 'classic-yourls' ),
+            esc_html__( 'Use in shortcode: [classicyourls_shortlink id="%d"]', 'classic-yourls' ),
             intval( $post->ID )
         ) . '</em></p>';
     }

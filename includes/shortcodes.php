@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register the shortcode
+ * Register the shortcode with consistent naming
  */
-add_shortcode( 'classic_yourls_shortlink', function( $atts ) {
+add_shortcode( 'classicyourls_shortlink', function( $atts ) {
     global $post;
     
     $atts = shortcode_atts( array(

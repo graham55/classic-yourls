@@ -4,7 +4,7 @@
 	margin : 0 10px 10px 0;
 }
 
-#better_yourls_support {
+#classic_yourls_support {
 
 	border      : 2px solid #00f;
 	font-weight : bold;
@@ -48,4 +48,54 @@ div.inside {
 
 	}
 
+}
+
+// Enhanced metabox styling for v2.4.2 features
+.classic-yourls-howto {
+
+	h3 {
+		margin-top    : 25px;
+		margin-bottom : 10px;
+		color         : #23282d;
+	}
+
+	h4 {
+		margin-top    : 15px;
+		margin-bottom : 5px;
+		color         : #555;
+	}
+
+	code {
+		background    : #f1f1f1;
+		padding       : 4px 8px;
+		border-radius : 3px;
+		font-family   : Consolas, Monaco, monospace;
+		font-size     : 13px;
+		display       : inline-block;
+		margin        : 5px 0;
+	}
+
+	ul, ol {
+		margin-left : 20px;
+	}
+
+	li {
+		margin-bottom : 8px;
+		line-height   : 1.5;
+	}
+
+}
+
+.classic-yourls-code-examples {
+	background    : #f9f9f9;
+	padding       : 15px;
+	border-left   : 4px solid #0073aa;
+	margin        : 15px 0;
+}
+
+.classic-yourls-compatibility {
+	background  : #e7f7e7;
+	padding     : 15px;
+	border-left : 4px solid #46b450;
+	margin      : 20px 0;
 }

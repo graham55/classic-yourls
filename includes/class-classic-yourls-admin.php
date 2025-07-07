@@ -77,10 +77,12 @@ class Classic_YOURLS_Admin {
         add_settings_field( 'classic_yourls[post_types]', esc_html__( 'Exclude Post Types', 'classic-yourls' ), array( $this, 'settings_field_post_types' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[private_post_types]', esc_html__( 'Allow Private Post Types', 'classic-yourls' ), array( $this, 'settings_field_private_post_types' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[shortcode_enabled]', esc_html__( 'Enable Shortcode', 'classic-yourls' ), array( $this, 'settings_field_shortcode_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
+        add_settings_field( 'classic_yourls[excerpt_shortcodes_enabled]', esc_html__( 'Enable Shortcodes in Excerpts', 'classic-yourls' ), array( $this, 'settings_field_excerpt_shortcodes_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
 
         register_setting( 'settings_page_classic_yourls', 'classic_yourls', array( $this, 'sanitize_module_input' ) );
 
         add_meta_box( 'classic_yourls_intro', esc_html__( 'Classic YOURLS', 'classic-yourls' ), array( $this, 'metabox_settings' ), 'settings_page_classic_yourls', 'main' );
+        add_meta_box( 'classic_yourls_howto', esc_html__( 'How to Use Classic YOURLS', 'classic-yourls' ), array( $this, 'metabox_howto' ), 'settings_page_classic_yourls', 'main' );
         add_meta_box( 'classic_yourls_subscribe', esc_html__( 'Subscribe', 'classic-yourls' ), array( $this, 'metaboxSubscribe' ), 'settings_page_classic_yourls', 'side' );
         add_meta_box( 'classic_yourls_support', esc_html__( 'Support This Plugin', 'classic-yourls' ), array( $this, 'metabox_support' ), 'settings_page_classic_yourls', 'side' );
         add_meta_box( 'classic_yourls_help', esc_html__( 'Need help?', 'classic-yourls' ), array( $this, 'metabox_help' ), 'settings_page_classic_yourls', 'side' );
@@ -148,6 +150,139 @@ class Classic_YOURLS_Admin {
             <?php do_settings_sections( 'settings_page_classic_yourls' ); ?>
             <?php submit_button(); ?>
         </form>
+        <?php
+    }
+
+    /**
+     * How-To metabox
+     */
+    public function metabox_howto() {
+        ?>
+        <div class="classic-yourls-howto">
+            <h3><?php esc_html_e( '🚀 Getting Started', 'classic-yourls' ); ?></h3>
+            <ol>
+                <li><strong><?php esc_html_e( 'Setup YOURLS:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Install YOURLS on your server or use a hosted service', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Configure Domain:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enter your YOURLS domain (e.g., short.example.com)', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Add API Token:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Get your API token from YOURLS admin and paste it above', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Save Settings:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Click "Save Changes" to activate the plugin', 'classic-yourls' ); ?></li>
+            </ol>
+
+            <h3><?php esc_html_e( '🔗 Automatic Short Links', 'classic-yourls' ); ?></h3>
+            <p><?php esc_html_e( 'Once configured, Classic YOURLS automatically creates short links for all your posts and pages. These links are:', 'classic-yourls' ); ?></p>
+            <ul>
+                <li><?php esc_html_e( 'Generated when posts are published', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Saved to post metadata for fast access', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Accessible via WordPress shortlink functions', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Visible in the admin bar for easy copying', 'classic-yourls' ); ?></li>
+            </ul>
+
+            <h3><?php esc_html_e( '📝 Using Shortcodes', 'classic-yourls' ); ?></h3>
+            <p><?php esc_html_e( 'When shortcodes are enabled, you can use the following shortcode in your posts, pages, and excerpts:', 'classic-yourls' ); ?></p>
+            
+            <div class="classic-yourls-code-examples">
+                <h4><?php esc_html_e( 'Basic Usage:', 'classic-yourls' ); ?></h4>
+                <code>[classicyourls_shortlink]</code>
+                <p class="description"><?php esc_html_e( 'Displays the short link for the current post', 'classic-yourls' ); ?></p>
+
+                <h4><?php esc_html_e( 'With Custom Text:', 'classic-yourls' ); ?></h4>
+                <code>[classicyourls_shortlink text="Click here for short link"]</code>
+                <p class="description"><?php esc_html_e( 'Creates a clickable link with custom text', 'classic-yourls' ); ?></p>
+
+                <h4><?php esc_html_e( 'For Specific Post:', 'classic-yourls' ); ?></h4>
+                <code>[classicyourls_shortlink id="123"]</code>
+                <p class="description"><?php esc_html_e( 'Shows the short link for post ID 123', 'classic-yourls' ); ?></p>
+
+                <h4><?php esc_html_e( 'Combined Example:', 'classic-yourls' ); ?></h4>
+                <code>[classicyourls_shortlink id="123" text="Read the full article"]</code>
+                <p class="description"><?php esc_html_e( 'Custom text linking to a specific post', 'classic-yourls' ); ?></p>
+            </div>
+
+            <h3><?php esc_html_e( '📄 Excerpt Integration', 'classic-yourls' ); ?></h3>
+            <p><?php esc_html_e( 'When "Enable Shortcodes in Excerpts" is activated:', 'classic-yourls' ); ?></p>
+            <ul>
+                <li><?php esc_html_e( 'Shortcodes work in custom excerpt fields', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Auto-generated excerpts process shortcodes', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Perfect for archive pages and RSS feeds', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Great for social media sharing', 'classic-yourls' ); ?></li>
+            </ul>
+
+            <h3><?php esc_html_e( '⚙️ Advanced Settings', 'classic-yourls' ); ?></h3>
+            <ul>
+                <li><strong><?php esc_html_e( 'HTTPS Support:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable if your YOURLS installation uses HTTPS', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Self-signed Certificates:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Allow connections to YOURLS with self-signed SSL certificates', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Post Type Exclusions:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Prevent short link creation for specific post types', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Private Post Types:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Allow short links for non-public post types', 'classic-yourls' ); ?></li>
+            </ul>
+
+            <h3><?php esc_html_e( '🎯 Post Editor Integration', 'classic-yourls' ); ?></h3>
+            <p><?php esc_html_e( 'In the post editor, you\'ll find a "YOURLS Keyword" metabox that shows:', 'classic-yourls' ); ?></p>
+            <ul>
+                <li><?php esc_html_e( 'The current post ID', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Example shortcode usage for that specific post', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Easy copy-paste shortcode examples', 'classic-yourls' ); ?></li>
+            </ul>
+
+            <h3><?php esc_html_e( '🔧 Troubleshooting Tips', 'classic-yourls' ); ?></h3>
+            <ul>
+                <li><strong><?php esc_html_e( 'Links not generating?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Check your YOURLS domain and API token', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'HTTPS errors?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable "Allow Self-signed https Certificate" if needed', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Shortcodes not working?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Ensure "Enable Shortcode" is checked', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Excerpts not processing?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Both shortcode options must be enabled', 'classic-yourls' ); ?></li>
+            </ul>
+
+            <div class="classic-yourls-compatibility">
+                <h3><?php esc_html_e( '✅ Compatibility', 'classic-yourls' ); ?></h3>
+                <p><?php esc_html_e( 'Classic YOURLS works with:', 'classic-yourls' ); ?></p>
+                <ul>
+                    <li><?php esc_html_e( 'WordPress 6.8+ (tested and confirmed)', 'classic-yourls' ); ?></li>
+                    <li><?php esc_html_e( 'ClassicPress (full compatibility)', 'classic-yourls' ); ?></li>
+                    <li><?php esc_html_e( 'Gutenberg Block Editor', 'classic-yourls' ); ?></li>
+                    <li><?php esc_html_e( 'Classic Editor', 'classic-yourls' ); ?></li>
+                    <li><?php esc_html_e( 'Popular social sharing plugins', 'classic-yourls' ); ?></li>
+                </ul>
+            </div>
+        </div>
+
+        <style>
+        .classic-yourls-howto h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #23282d;
+        }
+        .classic-yourls-howto h4 {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .classic-yourls-howto code {
+            background: #f1f1f1;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .classic-yourls-code-examples {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #0073aa;
+            margin: 15px 0;
+        }
+        .classic-yourls-compatibility {
+            background: #e7f7e7;
+            padding: 15px;
+            border-left: 4px solid #46b450;
+            margin: 20px 0;
+        }
+        .classic-yourls-howto ul, .classic-yourls-howto ol {
+            margin-left: 20px;
+        }
+        .classic-yourls-howto li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        </style>
         <?php
     }
 
@@ -236,6 +371,19 @@ class Classic_YOURLS_Admin {
         ?>
         <input type="checkbox" id="classic_yourls_shortcode_enabled" name="classic_yourls[shortcode_enabled]" value="1" <?php checked( $enabled ); ?> />
         <label for="classic_yourls_shortcode_enabled"><?php esc_html_e( 'Enable shortcode support', 'classic-yourls' ); ?></label>
+        <p class="description"><?php esc_html_e( 'Allow the [classicyourls_shortlink] shortcode to be used in posts and pages.', 'classic-yourls' ); ?></p>
+        <?php
+    }
+
+    /**
+     * Excerpt shortcodes enabled settings field
+     */
+    public function settings_field_excerpt_shortcodes_enabled() {
+        $enabled = isset( $this->settings['excerpt_shortcodes_enabled'] ) ? (bool) $this->settings['excerpt_shortcodes_enabled'] : false;
+        ?>
+        <input type="checkbox" id="classic_yourls_excerpt_shortcodes_enabled" name="classic_yourls[excerpt_shortcodes_enabled]" value="1" <?php checked( $enabled ); ?> />
+        <label for="classic_yourls_excerpt_shortcodes_enabled"><?php esc_html_e( 'Allow YOURLS shortcodes in post excerpts', 'classic-yourls' ); ?></label>
+        <p class="description"><?php esc_html_e( 'When enabled, shortcodes like [classicyourls_shortlink] will work in excerpt fields and auto-generated excerpts.', 'classic-yourls' ); ?></p>
         <?php
     }
 
@@ -266,6 +414,7 @@ class Classic_YOURLS_Admin {
         $input['https_ignore'] = isset( $input['https_ignore'] ) ? (bool) $input['https_ignore'] : false;
         $input['private_post_types'] = isset( $input['private_post_types'] ) ? (bool) $input['private_post_types'] : false;
         $input['shortcode_enabled'] = isset( $input['shortcode_enabled'] ) ? (bool) $input['shortcode_enabled'] : false;
+        $input['excerpt_shortcodes_enabled'] = isset( $input['excerpt_shortcodes_enabled'] ) ? (bool) $input['excerpt_shortcodes_enabled'] : false;
         
         $excluded = array();
         if ( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ) {

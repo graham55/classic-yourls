@@ -1,28 +1,39 @@
 === Classic YOURLS ===
 Contributors: channeleaton, ChrisWiegman, michaelbeil, domsammut, Graham McKoen
 Donate link: https://aaroneaton.blog
-Tags: yourls, shortlink, custom shortlink, shortlink short codes
+Tags: yourls, shortlink, custom shortlink, shortlink short codes, excerpts
 Requires at least: 4.2
-Tested up to: 5.1
-Stable tag: 2.4.0
+Tested up to: 6.8.1
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Integrate your blog with <a href="http://yourls.org" target="_blank">YOURLS</a> custom URL generator.
+Integrate your blog with <a href="http://yourls.org" target="_blank">YOURLS</a> custom URL generator with advanced shortcode support.
 
 == License ==
 Released under the terms of the GNU General Public License.
 
 == Description ==
 
-Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS</a> custom URL generator.
+Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS</a> custom URL generator, providing seamless short link creation with powerful shortcode functionality.
 
 = Features =
 
-* Creates YOURLs links for all content using wp_shortlink
+* Creates YOURLS links for all content using wp_shortlink
 * Saves links to post_meta to reduce server calls
 * Easily access link stats from the admin bar
-* Only 2 options: domain and api key
+* Advanced shortcode support with [betteryourls_shortlink]
+* Shortcode processing in post excerpts (optional)
+* Comprehensive built-in documentation and How-To guide
+* WordPress 6.8+ and ClassicPress compatibility
+* Gutenberg block editor support
+
+= Shortcode Usage =
+
+* `[betteryourls_shortlink]` - Display short link for current post
+* `[betteryourls_shortlink text="Custom Link Text"]` - Custom link text
+* `[betteryourls_shortlink id="123"]` - Short link for specific post
+* `[betteryourls_shortlink id="123" text="Read More"]` - Combined usage
 
 = Translations =
 
@@ -35,30 +46,56 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 3. Unzip
 4. Activate the plugin through the 'Plugins' menu in WordPress
 5. Visit the Classic YOURLS page under settings to add domain and API key
+6. Configure shortcode and excerpt options as needed
 
 == Frequently Asked Questions ==
 
 = Are you still developing this plugin? =
-* Yes! This plugin was adopted in 2018 by Aaron Eaton to continue development.
+* Yes! This plugin is actively maintained by Graham McKoen with continued development and feature additions.
 
 = Does this work with network or multisite installations? =
-* I don't know. I haven't tried it.
+* Multisite compatibility is being evaluated. Please test in a staging environment first.
+
+= How do I use shortcodes in excerpts? =
+* Enable both "Enable Shortcode" and "Enable Shortcodes in Excerpts" in the plugin settings, then use shortcodes normally in your excerpt fields.
+
+= What shortcode parameters are available? =
+* The plugin includes a comprehensive How-To guide in the settings page with all available parameters and usage examples.
+
+= Is this compatible with Gutenberg? =
+* Yes! The plugin works with both the Gutenberg block editor and the classic editor.
 
 = Can I help? =
 * Of course! I am in constant need of testers and I would be more than happy to add the right contributor. In addition, I could always use help with translations for internationalization.
 
 == Screenshots ==
 
-1. Easy to use with only 2 options.
+1. Easy to use settings interface with comprehensive options
+2. Built-in How-To guide with complete documentation
+3. Post editor integration with shortcode examples
 
 == Changelog ==
+
+= 2.4.2 =
+* Added comprehensive How-To guide in settings page with complete usage examples
+* Enhanced excerpt shortcode processing with user control settings
+* Added settings checkbox to enable/disable shortcodes in excerpts
+* Improved user documentation and troubleshooting guide
+* Confirmed WordPress 6.8.1 compatibility
+* Enhanced settings interface with better descriptions and organization
+
+= 2.4.1 =
+* First stable release with complete shortcode functionality
+* Complete project rebranding and name change implementation
+* Optimized JavaScript builds and minification
+* Updated language translations and i18n support
+* Established stable foundation for future development
 
 = 2.4.0 =
 * Initial fork and rebrand to Classic YOURLS
 * Plugin adopted by Graham McKoen <a href="https://github.com/graham55/classic-yourls" target="_blank">https://github.com/graham55/classic-yourls</a>
 * Updated all internal references to use classic_yourls naming convention
 * Maintained full backward compatibility with existing installations
-
 
 = 2.3.0 =
 * Plugin is now compatible with Gutenberg.
@@ -140,6 +177,15 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 * Initial Release
 
 == Upgrade Notice ==
+
+= 2.4.2 =
+* Version 2.4.2 adds comprehensive documentation and excerpt shortcode controls. Recommended for all users.
+
+= 2.4.1 =
+* Version 2.4.1 is the first stable release with complete shortcode functionality. Recommended for all users.
+
+= 2.4.0 =
+* Version 2.4.0 represents a major rebranding and modernization. Recommended for all users.
 
 = 2.1.4 =
 * Version 2.1.3 is a bugfix update that is recommended for all users.
