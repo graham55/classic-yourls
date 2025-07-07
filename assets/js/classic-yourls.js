@@ -1,8 +1,8 @@
 jQuery( document ).ready( function () {
 
-	jQuery( '#wp-admin-bar-better_yourls-link' ).click( function () {
+	jQuery( '#wp-admin-bar-classic_yourls-link' ).click( function () {
 
-		alert( better_yourls.text + '\n\n' + better_yourls.yourls_url );
+		alert( classic_yourls.text + '\n\n' + classic_yourls.yourls_url );
 
 	} );
 
