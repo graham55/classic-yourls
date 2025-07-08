@@ -78,6 +78,8 @@ class Classic_YOURLS_Admin {
         add_settings_field( 'classic_yourls[private_post_types]', esc_html__( 'Allow Private Post Types', 'classic-yourls' ), array( $this, 'settings_field_private_post_types' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[shortcode_enabled]', esc_html__( 'Enable Shortcode', 'classic-yourls' ), array( $this, 'settings_field_shortcode_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[excerpt_shortcodes_enabled]', esc_html__( 'Enable Shortcodes in Excerpts', 'classic-yourls' ), array( $this, 'settings_field_excerpt_shortcodes_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
+        add_settings_field( 'classic_yourls[replace_excerpt_readmore]', esc_html__( 'Replace Excerpt Read More', 'classic-yourls' ), array( $this, 'settings_field_replace_excerpt_readmore' ), 'settings_page_classic_yourls', 'classic_yourls' );
+        add_settings_field( 'classic_yourls[excerpt_replacement_text]', esc_html__( 'Replacement Link Text', 'classic-yourls' ), array( $this, 'settings_field_excerpt_replacement_text' ), 'settings_page_classic_yourls', 'classic_yourls' );
 
         register_setting( 'settings_page_classic_yourls', 'classic_yourls', array( $this, 'sanitize_module_input' ) );
 
@@ -206,6 +208,17 @@ class Classic_YOURLS_Admin {
                 <li><?php esc_html_e( 'Great for social media sharing', 'classic-yourls' ); ?></li>
             </ul>
 
+            <h3><?php esc_html_e( '🔄 Excerpt Read More Replacement', 'classic-yourls' ); ?></h3>
+            <p><?php esc_html_e( 'When "Replace Excerpt Read More" is enabled:', 'classic-yourls' ); ?></p>
+            <ul>
+                <li><?php esc_html_e( 'Automatically finds [...] and similar patterns in excerpts', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Replaces them with clickable short links', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Uses your custom replacement text (default: "Read More")', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Perfect for social media sharing and RSS feeds', 'classic-yourls' ); ?></li>
+                <li><?php esc_html_e( 'Works with both manual and auto-generated excerpts', 'classic-yourls' ); ?></li>
+            </ul>
+            <p><?php esc_html_e( 'This feature is separate from shortcodes and works automatically on excerpt display.', 'classic-yourls' ); ?></p>
+
             <h3><?php esc_html_e( '⚙️ Advanced Settings', 'classic-yourls' ); ?></h3>
             <ul>
                 <li><strong><?php esc_html_e( 'HTTPS Support:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable if your YOURLS installation uses HTTPS', 'classic-yourls' ); ?></li>
@@ -228,6 +241,7 @@ class Classic_YOURLS_Admin {
                 <li><strong><?php esc_html_e( 'HTTPS errors?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable "Allow Self-signed https Certificate" if needed', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Shortcodes not working?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Ensure "Enable Shortcode" is checked', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Excerpts not processing?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Both shortcode options must be enabled', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Read More replacement not working?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable "Replace Excerpt Read More" and ensure posts have short links', 'classic-yourls' ); ?></li>
             </ul>
 
             <div class="classic-yourls-compatibility">
@@ -388,6 +402,29 @@ class Classic_YOURLS_Admin {
     }
 
     /**
+     * Replace excerpt read more settings field
+     */
+    public function settings_field_replace_excerpt_readmore() {
+        $enabled = isset( $this->settings['replace_excerpt_readmore'] ) ? (bool) $this->settings['replace_excerpt_readmore'] : false;
+        ?>
+        <input type="checkbox" id="classic_yourls_replace_excerpt_readmore" name="classic_yourls[replace_excerpt_readmore]" value="1" <?php checked( $enabled ); ?> />
+        <label for="classic_yourls_replace_excerpt_readmore"><?php esc_html_e( 'Replace "Read More" links in excerpts with YOURLS short URLs', 'classic-yourls' ); ?></label>
+        <p class="description"><?php esc_html_e( 'Automatically replaces [...] and similar patterns in excerpts with clickable short links. Perfect for social media sharing.', 'classic-yourls' ); ?></p>
+        <?php
+    }
+
+    /**
+     * Excerpt replacement text settings field
+     */
+    public function settings_field_excerpt_replacement_text() {
+        $value = isset( $this->settings['excerpt_replacement_text'] ) ? $this->settings['excerpt_replacement_text'] : 'Read More';
+        ?>
+        <input type="text" id="classic_yourls_excerpt_replacement_text" name="classic_yourls[excerpt_replacement_text]" value="<?php echo esc_attr( $value ); ?>" class="regular-text" />
+        <p class="description"><?php esc_html_e( 'Text to display for the replacement link (default: "Read More")', 'classic-yourls' ); ?></p>
+        <?php
+    }
+
+    /**
      * Filter plugin action links
      */
     public function filter_plugin_action_links( $links, $file ) {
@@ -415,6 +452,8 @@ class Classic_YOURLS_Admin {
         $input['private_post_types'] = isset( $input['private_post_types'] ) ? (bool) $input['private_post_types'] : false;
         $input['shortcode_enabled'] = isset( $input['shortcode_enabled'] ) ? (bool) $input['shortcode_enabled'] : false;
         $input['excerpt_shortcodes_enabled'] = isset( $input['excerpt_shortcodes_enabled'] ) ? (bool) $input['excerpt_shortcodes_enabled'] : false;
+        $input['replace_excerpt_readmore'] = isset( $input['replace_excerpt_readmore'] ) ? (bool) $input['replace_excerpt_readmore'] : false;
+        $input['excerpt_replacement_text'] = isset( $input['excerpt_replacement_text'] ) ? sanitize_text_field( $input['excerpt_replacement_text'] ) : 'Read More';
         
         $excluded = array();
         if ( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ) {

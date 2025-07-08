@@ -26,7 +26,7 @@ add_shortcode( 'classicyourls_shortlink', function( $atts ) {
         return '';
     }
 
-    // Get the saved shortlink
+    // Get the saved shortlink using the global helper function
     $link = classic_yourls_get_link( $id );
     if ( ! $link ) {
         return '';
@@ -39,18 +39,3 @@ add_shortcode( 'classicyourls_shortlink', function( $atts ) {
 
     return '<a href="' . esc_url( $link ) . '">' . esc_html( $link ) . '</a>';
 } );
-
-/**
- * Helper function to get shortlink (maintains backward compatibility)
- */
-function classic_yourls_get_link( $post_id ) {
-    // Try new meta key first
-    $link = get_post_meta( $post_id, '_classic_yourls_short_link', true );
-    
-    // Fall back to old meta key for backward compatibility
-    if ( ! $link ) {
-        $link = get_post_meta( $post_id, '_better_yourls_short_link', true );
-    }
-    
-    return $link;
-}

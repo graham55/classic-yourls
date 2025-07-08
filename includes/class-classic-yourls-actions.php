@@ -51,7 +51,7 @@ class Classic_YOURLS_Actions {
              '' !== $this->settings['domain'] && 
              '' !== $this->settings['key'] ) {
             
-            add_action( 'add_meta_boxes', array( $this, 'action_add_meta_boxes' ) );
+            // NOTE: Meta box functionality removed - handled by Classic_YOURLS_Meta_Box class
             add_action( 'admin_bar_menu', array( $this, 'action_admin_bar_menu' ), 100 );
             add_action( 'save_post', array( $this, 'action_save_post' ), 11 );
             add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
@@ -60,69 +60,6 @@ class Classic_YOURLS_Actions {
             add_filter( 'pre_get_shortlink', array( $this, 'filter_pre_get_shortlink' ), 11, 2 );
             add_filter( 'sharing_permalink', array( $this, 'filter_sharing_permalink' ), 10, 2 );
         }
-    }
-
-    /**
-     * Adds meta box to post edit screen.
-     *
-     * @since 2.0.0
-     *
-     * @return void
-     */
-    public function action_add_meta_boxes() {
-        global $post;
-
-        if ( ! $post instanceof WP_Post ) {
-            return;
-        }
-
-        $post_type = get_post_type( $post->ID );
-
-        if ( false === $post_type || 
-             ( isset( $this->settings['post_types'] ) && 
-               in_array( $post_type, $this->settings['post_types'], true ) ) ) {
-            return;
-        }
-
-        add_meta_box(
-            'yourls_keyword',
-            esc_html__( 'YOURLS Keyword', 'classic-yourls' ),
-            array( $this, 'yourls_keyword_metabox' ),
-            $post->post_type,
-            'side',
-            'core'
-        );
-    }
-
-    /**
-     * Render the YOURLS metabox in the editor.
-     *
-     * @since 0.0.1
-     *
-     * @return void
-     */
-    public function yourls_keyword_metabox() {
-        global $post;
-
-        // Try new meta key first, fall back to old for backward compatibility
-        $link = get_post_meta( $post->ID, '_classic_yourls_short_link', true );
-        if ( ! $link ) {
-            $link = get_post_meta( $post->ID, '_better_yourls_short_link', true );
-        }
-
-        $readonly = $link ? 'readonly="readonly" ' : '';
-
-        wp_nonce_field( 'classic_yourls_save_post', 'classic_yourls_nonce' );
-
-        echo '<input type="text" id="classic-yourls-keyword" name="classic-yourls-keyword" value="' . esc_attr( $link ) . '" ' . $readonly . 'style="width: 100%;" />';
-        echo '<p><em>' . esc_html__( 'If a short-url doesn\'t yet exist for this post you can enter a keyword above. If it already exists it will be displayed.', 'classic-yourls' ) . '</em></p>';
-
-        // Add Post ID and shortcode usage hint - CORRECTED SHORTCODE NAME
-        echo '<p><strong>' . esc_html__( 'Post ID:', 'classic-yourls' ) . '</strong> ' . intval( $post->ID ) . '</p>';
-        echo '<p><em>' . sprintf(
-            esc_html__( 'Use in shortcode: [classicyourls_shortlink id="%d"]', 'classic-yourls' ),
-            intval( $post->ID )
-        ) . '</em></p>';
     }
 
     /**
@@ -158,7 +95,7 @@ class Classic_YOURLS_Actions {
 
             $wp_admin_bar->add_menu( array(
                 'id' => 'classic_yourls',
-                'title' => esc_html__( 'YOURLS', 'classic-yourls' ),
+                'title' => esc_html__( 'Classic YOURLS', 'classic-yourls' ),
             ) );
 
             $wp_admin_bar->add_menu( array(
@@ -269,7 +206,7 @@ class Classic_YOURLS_Actions {
         }
 
         if (
-            ! $this->_check_valid_post( $post_id ) &&
+            ! $this->_check_valid_post( $post_id ) ||
             ( ! isset( $_POST['classic_yourls_nonce'] ) || 
               ! wp_verify_nonce( $_POST['classic_yourls_nonce'], 'classic_yourls_save_post' ) )
         ) {
@@ -316,12 +253,8 @@ class Classic_YOURLS_Actions {
             return false;
         }
 
-        // Check for existing shortlink (try new meta key first, then old)
-        $existing = get_post_meta( $post_id, '_classic_yourls_short_link', true );
-        if ( ! $existing ) {
-            $existing = get_post_meta( $post_id, '_better_yourls_short_link', true );
-        }
-
+        // Use the global helper function for consistency
+        $existing = classic_yourls_get_link( $post_id );
         if ( $existing ) {
             return $existing;
         }
@@ -340,6 +273,8 @@ class Classic_YOURLS_Actions {
                 'url' => get_permalink( $post_id ),
                 'format' => 'JSON',
             ),
+            'timeout' => 30,
+            'user-agent' => 'Classic YOURLS WordPress Plugin/' . CYOURLS_VERSION,
         );
 
         if ( '' !== $keyword ) {
@@ -353,13 +288,32 @@ class Classic_YOURLS_Actions {
         $response = wp_remote_post( $yourls_url, $args );
 
         if ( is_wp_error( $response ) ) {
+            error_log( 'Classic YOURLS API Error: ' . $response->get_error_message() );
             return false;
         }
 
-        $short_link = isset( $response['body'] ) ? trim( $response['body'] ) : false;
-
-        if ( false === $short_link ) {
+        $response_code = wp_remote_retrieve_response_code( $response );
+        if ( 200 !== $response_code ) {
+            error_log( 'Classic YOURLS API HTTP Error: ' . $response_code );
             return false;
+        }
+
+        $short_link = wp_remote_retrieve_body( $response );
+        $short_link = trim( $short_link );
+
+        if ( empty( $short_link ) ) {
+            return false;
+        }
+
+        // Handle JSON response format
+        if ( 'JSON' === $args['body']['format'] ) {
+            $json_data = json_decode( $short_link, true );
+            if ( isset( $json_data['shorturl'] ) ) {
+                $short_link = $json_data['shorturl'];
+            } elseif ( isset( $json_data['status'] ) && 'fail' === $json_data['status'] ) {
+                error_log( 'Classic YOURLS API Error: ' . ( $json_data['message'] ?? 'Unknown error' ) );
+                return false;
+            }
         }
 
         $url = esc_url( $short_link );
@@ -437,11 +391,8 @@ class Classic_YOURLS_Actions {
             return $short_link;
         }
 
-        // Try new meta key first, fall back to old for backward compatibility
-        $link = get_post_meta( $id, '_classic_yourls_short_link', true );
-        if ( ! $link ) {
-            $link = get_post_meta( $id, '_better_yourls_short_link', true );
-        }
+        // Use the global helper function for consistency
+        $link = classic_yourls_get_link( $id );
 
         return $link ? $link : $short_link;
     }
@@ -485,7 +436,7 @@ class Classic_YOURLS_Actions {
             wp_enqueue_script( 'classic_yourls' );
 
             wp_localize_script( 'classic_yourls', 'classic_yourls', array(
-                'text' => esc_html__( 'Your YOURLS short link is: ', 'classic-yourls' ),
+                'text' => esc_html__( 'Your Classic YOURLS short link is: ', 'classic-yourls' ),
                 'yourls_url' => wp_get_shortlink( $post->ID ),
             ) );
         }

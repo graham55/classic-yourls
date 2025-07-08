@@ -19,10 +19,26 @@ define( 'CYOURLS_VERSION', '2.4.2' );
 define( 'CYOURLS_URL', plugin_dir_url( __FILE__ ) );
 define( 'CYOURLS_PATH', plugin_dir_path( __FILE__ ) );
 
+/**
+ * Helper function to get shortlink (maintains backward compatibility)
+ */
+function classic_yourls_get_link( $post_id ) {
+    // Try new meta key first
+    $link = get_post_meta( $post_id, '_classic_yourls_short_link', true );
+    
+    // Fall back to old meta key for backward compatibility
+    if ( ! $link ) {
+        $link = get_post_meta( $post_id, '_better_yourls_short_link', true );
+    }
+    
+    return $link;
+}
+
 // Include required files
 require_once( CYOURLS_PATH . 'includes/class-classic-yourls-setup.php' );
 require_once( CYOURLS_PATH . 'includes/class-classic-yourls-actions.php' );
 require_once( CYOURLS_PATH . 'includes/class-classic-yourls-admin.php' );
+require_once( CYOURLS_PATH . 'includes/class-classic-yourls-meta-box.php' ); // Add enhanced meta box
 
 // Register hooks
 register_activation_hook( __FILE__, array( 'Classic_YOURLS_Setup', 'on_activate' ) );
@@ -31,15 +47,18 @@ register_deactivation_hook( __FILE__, array( 'Classic_YOURLS_Setup', 'on_deactiv
 // Initialize the plugin
 if ( is_admin() ) {
     new Classic_YOURLS_Admin();
+    new Classic_YOURLS_Meta_Box(); // Initialize enhanced meta box
 }
 
 new Classic_YOURLS_Actions();
 
-// Load shortcode functionality after WordPress is fully loaded
-add_action( 'init', 'classic_yourls_load_shortcode' );
+// Load features after WordPress is fully loaded
+add_action( 'init', 'classic_yourls_load_features' );
 
-function classic_yourls_load_shortcode() {
+function classic_yourls_load_features() {
     $settings = get_option( 'classic_yourls' );
+    
+    // Load shortcode functionality if enabled
     if ( ! empty( $settings['shortcode_enabled'] ) ) {
         require_once( CYOURLS_PATH . 'includes/shortcodes.php' );
         
@@ -48,6 +67,11 @@ function classic_yourls_load_shortcode() {
             add_filter( 'get_the_excerpt', 'classic_yourls_process_shortcodes_in_excerpt', 10 );
             add_filter( 'the_excerpt', 'classic_yourls_process_shortcodes_in_excerpt', 10 );
         }
+    }
+    
+    // Load excerpt replacement functionality if enabled
+    if ( ! empty( $settings['replace_excerpt_readmore'] ) ) {
+        require_once( CYOURLS_PATH . 'includes/excerpt-replacement.php' );
     }
 }
 

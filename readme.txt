@@ -22,18 +22,26 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 * Creates YOURLS links for all content using wp_shortlink
 * Saves links to post_meta to reduce server calls
 * Easily access link stats from the admin bar
-* Advanced shortcode support with [betteryourls_shortlink]
+* Advanced shortcode support with [classicyourls_shortlink]
 * Shortcode processing in post excerpts (optional)
+* Excerpt "Read More" replacement functionality
 * Comprehensive built-in documentation and How-To guide
 * WordPress 6.8+ and ClassicPress compatibility
 * Gutenberg block editor support
 
 = Shortcode Usage =
 
-* `[betteryourls_shortlink]` - Display short link for current post
-* `[betteryourls_shortlink text="Custom Link Text"]` - Custom link text
-* `[betteryourls_shortlink id="123"]` - Short link for specific post
-* `[betteryourls_shortlink id="123" text="Read More"]` - Combined usage
+* `[classicyourls_shortlink]` - Display short link for current post
+* `[classicyourls_shortlink text="Custom Link Text"]` - Custom link text
+* `[classicyourls_shortlink id="123"]` - Short link for specific post
+* `[classicyourls_shortlink id="123" text="Read More"]` - Combined usage
+
+= Excerpt Features =
+
+* Shortcode processing in excerpts (optional)
+* Automatic "Read More" link replacement with short URLs
+* Customizable replacement text
+* Perfect for social media sharing and RSS feeds
 
 = Translations =
 
@@ -59,6 +67,9 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 = How do I use shortcodes in excerpts? =
 * Enable both "Enable Shortcode" and "Enable Shortcodes in Excerpts" in the plugin settings, then use shortcodes normally in your excerpt fields.
 
+= What is the excerpt "Read More" replacement feature? =
+* This feature automatically replaces [...] and similar patterns in excerpts with clickable short links, perfect for social media sharing.
+
 = What shortcode parameters are available? =
 * The plugin includes a comprehensive How-To guide in the settings page with all available parameters and usage examples.
 
@@ -72,15 +83,19 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 
 1. Easy to use settings interface with comprehensive options
 2. Built-in How-To guide with complete documentation
-3. Post editor integration with shortcode examples
+3. Enhanced post editor metabox with shortcode examples
+4. Excerpt replacement settings and controls
 
 == Changelog ==
 
 = 2.4.2 =
 * Added comprehensive How-To guide in settings page with complete usage examples
 * Enhanced excerpt shortcode processing with user control settings
+* Added excerpt "Read More" replacement functionality
 * Added settings checkbox to enable/disable shortcodes in excerpts
+* Added customizable replacement text for excerpt links
 * Improved user documentation and troubleshooting guide
+* Enhanced post editor metabox with better user guidance
 * Confirmed WordPress 6.8.1 compatibility
 * Enhanced settings interface with better descriptions and organization
 
@@ -179,7 +194,7 @@ Integrates your blog with the <a href="http://yourls.org" target="_blank">YOURLS
 == Upgrade Notice ==
 
 = 2.4.2 =
-* Version 2.4.2 adds comprehensive documentation and excerpt shortcode controls. Recommended for all users.
+* Version 2.4.2 adds comprehensive documentation, excerpt replacement functionality, and enhanced shortcode controls. Recommended for all users.
 
 = 2.4.1 =
 * Version 2.4.1 is the first stable release with complete shortcode functionality. Recommended for all users.
