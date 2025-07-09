@@ -118,21 +118,31 @@ class Classic_YOURLS_Actions {
     }
 
     protected function _generate_post_on_save( $post_id ) {
+        // Debug logging
+        error_log( 'Classic YOURLS: _generate_post_on_save called for post ' . $post_id );
+        
         if ( defined( 'REST_REQUEST' ) ) {
+            error_log( 'Classic YOURLS: Skipping - REST_REQUEST defined' );
             return;
         }
 
         if ( ! $this->_check_valid_post( $post_id ) ) {
+            error_log( 'Classic YOURLS: Skipping - invalid post' );
             return;
         }
 
+        // Debug POST data
+        error_log( 'Classic YOURLS: POST action = ' . ( $_POST['action'] ?? 'not set' ) );
+        error_log( 'Classic YOURLS: Nonce present = ' . ( isset( $_POST['classic_yourls_nonce'] ) ? 'yes' : 'no' ) );
+
         // Only require nonce verification for direct form submissions
-        // Skip nonce check for automated processes like transition_post_status
         $require_nonce = isset( $_POST['action'] ) && 'editpost' === $_POST['action'];
+        error_log( 'Classic YOURLS: Require nonce = ' . ( $require_nonce ? 'yes' : 'no' ) );
         
         if ( $require_nonce ) {
             if ( ! isset( $_POST['classic_yourls_nonce'] ) || 
                  ! wp_verify_nonce( $_POST['classic_yourls_nonce'], 'classic_yourls_save_post' ) ) {
+                error_log( 'Classic YOURLS: Security error - nonce verification failed' );
                 wp_die( esc_html__( 'Security Error', 'classic-yourls' ) );
             }
         }
@@ -140,13 +150,18 @@ class Classic_YOURLS_Actions {
         $keyword = '';
         if ( isset( $_POST['classic-yourls-keyword'] ) ) {
             $keyword = sanitize_title( trim( $_POST['classic-yourls-keyword'] ) );
+            error_log( 'Classic YOURLS: Keyword from POST = ' . $keyword );
         }
 
         $keyword = apply_filters( 'classic_yourls_keyword', $keyword, $post_id );
+        error_log( 'Classic YOURLS: Final keyword = ' . $keyword );
+        
         $link = $this->create_yourls_url( $post_id, $keyword, '', 'save_post' );
+        error_log( 'Classic YOURLS: Generated link = ' . ( $link ? $link : 'failed' ) );
 
         // Keyword would be a duplicate so use a standard one
         if ( '' !== $keyword && ! $link ) {
+            error_log( 'Classic YOURLS: Retrying without keyword' );
             $link = $this->create_yourls_url( $post_id, '', '', 'save_post' );
         }
 
@@ -154,6 +169,9 @@ class Classic_YOURLS_Actions {
         if ( $link ) {
             update_post_meta( $post_id, '_classic_yourls_short_link', $link );
             update_post_meta( $post_id, '_better_yourls_short_link', $link );
+            error_log( 'Classic YOURLS: Link saved successfully' );
+        } else {
+            error_log( 'Classic YOURLS: Failed to generate or save link' );
         }
     }
 
