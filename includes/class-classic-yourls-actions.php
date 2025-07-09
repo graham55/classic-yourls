@@ -172,11 +172,13 @@ class Classic_YOURLS_Actions {
         $link = $this->create_yourls_url( $post_id, $keyword, '', 'save_post' );
         $this->debug_log( 'Generated link = ' . ( $link ? $link : 'failed' ) );
 
+        // Keyword would be a duplicate so use a standard one
         if ( '' !== $keyword && ! $link ) {
             $this->debug_log( 'Retrying without keyword' );
             $link = $this->create_yourls_url( $post_id, '', '', 'save_post' );
         }
 
+        // Save the short URL only if it was generated correctly
         if ( $link ) {
             update_post_meta( $post_id, '_classic_yourls_short_link', $link );
             update_post_meta( $post_id, '_better_yourls_short_link', $link );
