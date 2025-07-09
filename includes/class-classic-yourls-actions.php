@@ -121,18 +121,36 @@ class Classic_YOURLS_Actions {
         if ( defined( 'REST_REQUEST' ) ) {
             return;
         }
-        if ( ! $this->_check_valid_post( $post_id ) || ( ! isset( $_POST['classic_yourls_nonce'] ) || ! wp_verify_nonce( $_POST['classic_yourls_nonce'], 'classic_yourls_save_post' ) ) ) {
-            wp_die( esc_html__( 'Security Error', 'classic-yourls' ) );
+
+        if ( ! $this->_check_valid_post( $post_id ) ) {
+            return;
         }
+
+        // Only require nonce verification for direct form submissions
+        // Skip nonce check for automated processes like transition_post_status
+        $require_nonce = isset( $_POST['action'] ) && 'editpost' === $_POST['action'];
+        
+        if ( $require_nonce ) {
+            if ( ! isset( $_POST['classic_yourls_nonce'] ) || 
+                 ! wp_verify_nonce( $_POST['classic_yourls_nonce'], 'classic_yourls_save_post' ) ) {
+                wp_die( esc_html__( 'Security Error', 'classic-yourls' ) );
+            }
+        }
+
         $keyword = '';
         if ( isset( $_POST['classic-yourls-keyword'] ) ) {
             $keyword = sanitize_title( trim( $_POST['classic-yourls-keyword'] ) );
         }
+
         $keyword = apply_filters( 'classic_yourls_keyword', $keyword, $post_id );
         $link = $this->create_yourls_url( $post_id, $keyword, '', 'save_post' );
-        if ( '' !== $keyword && !$link ) {
+
+        // Keyword would be a duplicate so use a standard one
+        if ( '' !== $keyword && ! $link ) {
             $link = $this->create_yourls_url( $post_id, '', '', 'save_post' );
         }
+
+        // Save the short URL only if it was generated correctly
         if ( $link ) {
             update_post_meta( $post_id, '_classic_yourls_short_link', $link );
             update_post_meta( $post_id, '_better_yourls_short_link', $link );
