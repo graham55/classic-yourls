@@ -29,7 +29,6 @@ class Classic_YOURLS_Actions {
         if ( isset( $this->settings['domain'], $this->settings['key'] ) && 
              '' !== $this->settings['domain'] && 
              '' !== $this->settings['key'] ) {
-            // Removed meta box hooks, handled by Meta Box class
             add_action( 'admin_bar_menu', array( $this, 'action_admin_bar_menu' ), 100 );
             add_action( 'save_post', array( $this, 'action_save_post' ), 11 );
             add_action( 'wp_enqueue_scripts', array( $this, 'action_wp_enqueue_scripts' ) );
@@ -37,6 +36,22 @@ class Classic_YOURLS_Actions {
             add_filter( 'get_shortlink', array( $this, 'filter_get_shortlink' ), 10, 3 );
             add_filter( 'pre_get_shortlink', array( $this, 'filter_pre_get_shortlink' ), 11, 2 );
             add_filter( 'sharing_permalink', array( $this, 'filter_sharing_permalink' ), 10, 2 );
+        }
+    }
+
+    /**
+     * Helper method to check if debug logging is enabled
+     */
+    private function is_debug_enabled() {
+        return ! empty( $this->settings['debug_enabled'] );
+    }
+
+    /**
+     * Helper method for conditional debug logging
+     */
+    private function debug_log( $message ) {
+        if ( $this->is_debug_enabled() ) {
+            error_log( 'Classic YOURLS: ' . $message );
         }
     }
 
@@ -118,31 +133,29 @@ class Classic_YOURLS_Actions {
     }
 
     protected function _generate_post_on_save( $post_id ) {
-        // Debug logging
-        error_log( 'Classic YOURLS: _generate_post_on_save called for post ' . $post_id );
+        $this->debug_log( '_generate_post_on_save called for post ' . $post_id );
         
         if ( defined( 'REST_REQUEST' ) ) {
-            error_log( 'Classic YOURLS: Skipping - REST_REQUEST defined' );
+            $this->debug_log( 'Skipping - REST_REQUEST defined' );
             return;
         }
 
         if ( ! $this->_check_valid_post( $post_id ) ) {
-            error_log( 'Classic YOURLS: Skipping - invalid post' );
+            $this->debug_log( 'Skipping - invalid post' );
             return;
         }
 
-        // Debug POST data
-        error_log( 'Classic YOURLS: POST action = ' . ( $_POST['action'] ?? 'not set' ) );
-        error_log( 'Classic YOURLS: Nonce present = ' . ( isset( $_POST['classic_yourls_nonce'] ) ? 'yes' : 'no' ) );
+        $this->debug_log( 'POST action = ' . ( $_POST['action'] ?? 'not set' ) );
+        $this->debug_log( 'Nonce present = ' . ( isset( $_POST['classic_yourls_nonce'] ) ? 'yes' : 'no' ) );
 
         // Only require nonce verification for direct form submissions
         $require_nonce = isset( $_POST['action'] ) && 'editpost' === $_POST['action'];
-        error_log( 'Classic YOURLS: Require nonce = ' . ( $require_nonce ? 'yes' : 'no' ) );
+        $this->debug_log( 'Require nonce = ' . ( $require_nonce ? 'yes' : 'no' ) );
         
         if ( $require_nonce ) {
             if ( ! isset( $_POST['classic_yourls_nonce'] ) || 
                  ! wp_verify_nonce( $_POST['classic_yourls_nonce'], 'classic_yourls_save_post' ) ) {
-                error_log( 'Classic YOURLS: Security error - nonce verification failed' );
+                $this->debug_log( 'Security error - nonce verification failed' );
                 wp_die( esc_html__( 'Security Error', 'classic-yourls' ) );
             }
         }
@@ -150,28 +163,26 @@ class Classic_YOURLS_Actions {
         $keyword = '';
         if ( isset( $_POST['classic-yourls-keyword'] ) ) {
             $keyword = sanitize_title( trim( $_POST['classic-yourls-keyword'] ) );
-            error_log( 'Classic YOURLS: Keyword from POST = ' . $keyword );
+            $this->debug_log( 'Keyword from POST = ' . $keyword );
         }
 
         $keyword = apply_filters( 'classic_yourls_keyword', $keyword, $post_id );
-        error_log( 'Classic YOURLS: Final keyword = ' . $keyword );
+        $this->debug_log( 'Final keyword = ' . $keyword );
         
         $link = $this->create_yourls_url( $post_id, $keyword, '', 'save_post' );
-        error_log( 'Classic YOURLS: Generated link = ' . ( $link ? $link : 'failed' ) );
+        $this->debug_log( 'Generated link = ' . ( $link ? $link : 'failed' ) );
 
-        // Keyword would be a duplicate so use a standard one
         if ( '' !== $keyword && ! $link ) {
-            error_log( 'Classic YOURLS: Retrying without keyword' );
+            $this->debug_log( 'Retrying without keyword' );
             $link = $this->create_yourls_url( $post_id, '', '', 'save_post' );
         }
 
-        // Save the short URL only if it was generated correctly
         if ( $link ) {
             update_post_meta( $post_id, '_classic_yourls_short_link', $link );
             update_post_meta( $post_id, '_better_yourls_short_link', $link );
-            error_log( 'Classic YOURLS: Link saved successfully' );
+            $this->debug_log( 'Link saved successfully' );
         } else {
-            error_log( 'Classic YOURLS: Failed to generate or save link' );
+            $this->debug_log( 'Failed to generate or save link' );
         }
     }
 
@@ -179,46 +190,74 @@ class Classic_YOURLS_Actions {
         if ( is_preview() && ! is_admin() ) {
             return false;
         }
+        
         $existing = classic_yourls_get_link( $post_id );
         if ( $existing ) {
+            $this->debug_log( 'Existing link found: ' . $existing );
             return $existing;
         }
+        
         $https = ( isset( $this->settings['https'] ) && true === $this->settings['https'] ) ? 's' : '';
         $yourls_url = esc_url_raw( 'http' . $https . '://' . $this->settings['domain'] . '/yourls-api.php' );
         $timestamp = current_time( 'timestamp' );
+        $post_url = get_permalink( $post_id );
+        
+        $this->debug_log( 'Post ID = ' . $post_id );
+        $this->debug_log( 'Post URL = ' . $post_url );
+        $this->debug_log( 'YOURLS API URL = ' . $yourls_url );
+        $this->debug_log( 'Keyword = ' . $keyword );
+        
         $args = array(
             'body' => array(
                 'title' => ( '' === trim( $title ) ) ? get_the_title( $post_id ) : $title,
                 'timestamp' => $timestamp,
                 'signature' => md5( $timestamp . $this->settings['key'] ),
                 'action' => 'shorturl',
-                'url' => get_permalink( $post_id ),
+                'url' => $post_url,
                 'format' => 'JSON',
             ),
             'timeout' => 30,
             'user-agent' => 'Classic YOURLS WordPress Plugin/' . CYOURLS_VERSION,
         );
+        
         if ( '' !== $keyword ) {
             $args['body']['keyword'] = sanitize_title( $keyword );
         }
+        
         if ( isset( $this->settings['https_ignore'] ) && true === $this->settings['https_ignore'] ) {
             $args['sslverify'] = false;
         }
+        
+        if ( $this->is_debug_enabled() ) {
+            $this->debug_log( 'API Request Body = ' . print_r( $args['body'], true ) );
+        }
+        
         $response = wp_remote_post( $yourls_url, $args );
+        
         if ( is_wp_error( $response ) ) {
             error_log( 'Classic YOURLS API Error: ' . $response->get_error_message() );
             return false;
         }
+        
         $response_code = wp_remote_retrieve_response_code( $response );
+        $response_body = wp_remote_retrieve_body( $response );
+        
+        $this->debug_log( 'API Response Code = ' . $response_code );
+        if ( $this->is_debug_enabled() ) {
+            $this->debug_log( 'API Response Body = ' . $response_body );
+        }
+        
         if ( 200 !== $response_code ) {
             error_log( 'Classic YOURLS API HTTP Error: ' . $response_code );
             return false;
         }
-        $short_link = wp_remote_retrieve_body( $response );
-        $short_link = trim( $short_link );
+        
+        $short_link = trim( $response_body );
+        
         if ( empty( $short_link ) ) {
             return false;
         }
+        
         if ( 'JSON' === $args['body']['format'] ) {
             $json_data = json_decode( $short_link, true );
             if ( isset( $json_data['shorturl'] ) ) {
@@ -228,6 +267,7 @@ class Classic_YOURLS_Actions {
                 return false;
             }
         }
+        
         $url = esc_url( $short_link );
         if ( $this->validate_url( $url ) ) {
             $url = apply_filters( 'classic_yourls_shortlink', $url, $post_id, $hook );
@@ -239,6 +279,7 @@ class Classic_YOURLS_Actions {
             update_post_meta( $post_id, '_better_yourls_short_link', $url );
             return $url;
         }
+        
         return false;
     }
 

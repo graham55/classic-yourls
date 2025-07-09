@@ -80,6 +80,7 @@ class Classic_YOURLS_Admin {
         add_settings_field( 'classic_yourls[excerpt_shortcodes_enabled]', esc_html__( 'Enable Shortcodes in Excerpts', 'classic-yourls' ), array( $this, 'settings_field_excerpt_shortcodes_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[replace_excerpt_readmore]', esc_html__( 'Replace Excerpt Read More', 'classic-yourls' ), array( $this, 'settings_field_replace_excerpt_readmore' ), 'settings_page_classic_yourls', 'classic_yourls' );
         add_settings_field( 'classic_yourls[excerpt_replacement_text]', esc_html__( 'Replacement Link Text', 'classic-yourls' ), array( $this, 'settings_field_excerpt_replacement_text' ), 'settings_page_classic_yourls', 'classic_yourls' );
+        add_settings_field( 'classic_yourls[debug_enabled]', esc_html__( 'Enable Debug Logging', 'classic-yourls' ), array( $this, 'settings_field_debug_enabled' ), 'settings_page_classic_yourls', 'classic_yourls' );
 
         register_setting( 'settings_page_classic_yourls', 'classic_yourls', array( $this, 'sanitize_module_input' ) );
 
@@ -225,6 +226,7 @@ class Classic_YOURLS_Admin {
                 <li><strong><?php esc_html_e( 'Self-signed Certificates:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Allow connections to YOURLS with self-signed SSL certificates', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Post Type Exclusions:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Prevent short link creation for specific post types', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Private Post Types:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Allow short links for non-public post types', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Debug Logging:', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable detailed logging for troubleshooting issues', 'classic-yourls' ); ?></li>
             </ul>
 
             <h3><?php esc_html_e( '🎯 Post Editor Integration', 'classic-yourls' ); ?></h3>
@@ -242,6 +244,7 @@ class Classic_YOURLS_Admin {
                 <li><strong><?php esc_html_e( 'Shortcodes not working?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Ensure "Enable Shortcode" is checked', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Excerpts not processing?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Both shortcode options must be enabled', 'classic-yourls' ); ?></li>
                 <li><strong><?php esc_html_e( 'Read More replacement not working?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable "Replace Excerpt Read More" and ensure posts have short links', 'classic-yourls' ); ?></li>
+                <li><strong><?php esc_html_e( 'Need detailed debugging?', 'classic-yourls' ); ?></strong> <?php esc_html_e( 'Enable "Debug Logging" and check your WordPress error log', 'classic-yourls' ); ?></li>
             </ul>
 
             <div class="classic-yourls-compatibility">
@@ -425,6 +428,18 @@ class Classic_YOURLS_Admin {
     }
 
     /**
+     * Debug enabled settings field
+     */
+    public function settings_field_debug_enabled() {
+        $enabled = isset( $this->settings['debug_enabled'] ) ? (bool) $this->settings['debug_enabled'] : false;
+        ?>
+        <input type="checkbox" id="classic_yourls_debug_enabled" name="classic_yourls[debug_enabled]" value="1" <?php checked( $enabled ); ?> />
+        <label for="classic_yourls_debug_enabled"><?php esc_html_e( 'Enable detailed debug logging for troubleshooting', 'classic-yourls' ); ?></label>
+        <p class="description"><?php esc_html_e( 'When enabled, detailed debug information will be logged to help diagnose issues. Only enable when troubleshooting problems.', 'classic-yourls' ); ?></p>
+        <?php
+    }
+
+    /**
      * Filter plugin action links
      */
     public function filter_plugin_action_links( $links, $file ) {
@@ -454,6 +469,7 @@ class Classic_YOURLS_Admin {
         $input['excerpt_shortcodes_enabled'] = isset( $input['excerpt_shortcodes_enabled'] ) ? (bool) $input['excerpt_shortcodes_enabled'] : false;
         $input['replace_excerpt_readmore'] = isset( $input['replace_excerpt_readmore'] ) ? (bool) $input['replace_excerpt_readmore'] : false;
         $input['excerpt_replacement_text'] = isset( $input['excerpt_replacement_text'] ) ? sanitize_text_field( $input['excerpt_replacement_text'] ) : 'Read More';
+        $input['debug_enabled'] = isset( $input['debug_enabled'] ) ? (bool) $input['debug_enabled'] : false;
         
         $excluded = array();
         if ( isset( $input['post_types'] ) && is_array( $input['post_types'] ) ) {
