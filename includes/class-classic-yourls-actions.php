@@ -40,14 +40,14 @@ class Classic_YOURLS_Actions {
     }
 
     /**
-     * Helper method to check if debug logging is enabled
+     * Helper: Check if debug logging is enabled.
      */
     private function is_debug_enabled() {
         return ! empty( $this->settings['debug_enabled'] );
     }
 
     /**
-     * Helper method for conditional debug logging
+     * Helper: Conditional debug log.
      */
     private function debug_log( $message ) {
         if ( $this->is_debug_enabled() ) {
@@ -237,7 +237,7 @@ class Classic_YOURLS_Actions {
         $response = wp_remote_post( $yourls_url, $args );
         
         if ( is_wp_error( $response ) ) {
-            error_log( 'Classic YOURLS API Error: ' . $response->get_error_message() );
+            $this->debug_log( 'API Error: ' . $response->get_error_message() ); // Changed for conditional logging
             return false;
         }
         
@@ -250,7 +250,7 @@ class Classic_YOURLS_Actions {
         }
         
         if ( 200 !== $response_code ) {
-            error_log( 'Classic YOURLS API HTTP Error: ' . $response_code );
+            $this->debug_log( 'API HTTP Error: ' . $response_code ); // Changed for conditional logging
             return false;
         }
         
@@ -265,7 +265,7 @@ class Classic_YOURLS_Actions {
             if ( isset( $json_data['shorturl'] ) ) {
                 $short_link = $json_data['shorturl'];
             } elseif ( isset( $json_data['status'] ) && 'fail' === $json_data['status'] ) {
-                error_log( 'Classic YOURLS API Error: ' . ( $json_data['message'] ?? 'Unknown error' ) );
+                $this->debug_log( 'API Error: ' . ( $json_data['message'] ?? 'Unknown error' ) ); // Changed
                 return false;
             }
         }
